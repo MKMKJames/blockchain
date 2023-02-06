@@ -72,17 +72,17 @@ func decryptUserData(msg, key string) string {
 }
 
 func getSecretKey(id string) string {
-	// file, err := os.OpenFile("./secret_key_"+id, os.O_RDONLY, 0666)
-	// if err == nil {
-	// 	sk, err := ioutil.ReadAll(file)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	return string(sk)
-	// }
+	file, err := os.OpenFile("./secret_key_"+id, os.O_RDONLY, 0666)
+	if err == nil {
+		sk, err := ioutil.ReadAll(file)
+		if err != nil {
+			panic(err)
+		}
+		return string(sk)
+	}
 	urlValues := url.Values{}
 	urlValues.Add("id", id)
-	resp, err := http.PostForm("http://127.0.0.1:8888/keyGen", urlValues)
+	resp, err := http.PostForm("http://127.0.0.1:1234/keyGen", urlValues)
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +91,7 @@ func getSecretKey(id string) string {
 		panic(err)
 	}
 	sk := string(body)
-	// writeSecretKey(sk, id)
+	writeSecretKey(sk, id)
 	return sk
 }
 

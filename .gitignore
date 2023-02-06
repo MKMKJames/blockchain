@@ -1,0 +1,6 @@
+cloud_similating_server/db
+user/secret*
+proxy/params
+pkg/params
+pkg/__pycache__
+proxy/__pycache__

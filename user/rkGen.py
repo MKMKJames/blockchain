@@ -35,7 +35,7 @@ class PreGA:
         return bytesToObject(data, group)
 
     def rkGen(self, skid, IDsrc, IDdest):
-        N = integer(randomBits(group.secparam))
+        N = integer(32423442342)
         K = pair(skid, group.hash(IDdest, G1))
         return {'N': N, 'R': group.hash((K, IDsrc, IDdest, N), G1) * skid}
 
