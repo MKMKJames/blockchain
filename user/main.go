@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"strconv"
 	"time"
 
 	"github.com/fernet/fernet-go"
@@ -169,8 +168,7 @@ func decrypt(sk2, id1, id2, cmsg string) string {
 	if err != nil {
 		panic(err)
 	}
-	s := string(body)
-	return s[1 : len(s)-1]
+	return string(body)
 }
 
 func main() {
@@ -187,9 +185,6 @@ func main() {
 	re_ckey := reEncrypt(A, rk, ckey)
 
 	de_key := decrypt(sk2, A, B, re_ckey)
-	s, err := strconv.Unquote(`"` + de_key + `"`)
-	if err != nil {
-		panic(err)
-	}
-	println(decryptUserData(final, decodeCompoundKey(s).Key))
+
+	println(decryptUserData(final, decodeCompoundKey(de_key).Key))
 }

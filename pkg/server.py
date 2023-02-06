@@ -13,20 +13,8 @@ class Util:
         sk = self.proxy.keyGen(self.master_secret_key, id)
         return self.serialize_sk(sk)
 
-    def rkGen(self, sk1, id1, id2):
-        return self.serialize_rk(self.proxy.rkGen(self.params, self.deserialize_sk(sk1), id1, id2))
-
     def serialize_sk(self, data):
         return self.proxy.serialize_sk(data)
-
-    def deserialize_sk(self, data):
-        return self.proxy.deserialize_sk(data)
-
-    def serialize_rk(self, data):
-        return self.proxy.serialize_rk(data)
-
-    def deserialize_rk(self, data):
-        return self.proxy.deserialize_rk(data)
 
 
 # 创建一个服务，把当前这个python文件当做一个服务
@@ -37,15 +25,7 @@ util = Util()
 @server.route('/keyGen', methods=['post'])
 def keyGen():
     id = request.form['id']
-    return json.dumps(util.keyGen(id), ensure_ascii=False)
-
-
-@server.route('/rkGen', methods=['post'])
-def rkGen():
-    sk1 = eval(request.form['sk1'])
-    id1 = request.form['id1']
-    id2 = request.form['id2']
-    return json.dumps(util.rkGen(sk1, id1, id2), ensure_ascii=False)
+    return util.keyGen(id)
 
 
 if __name__ == '__main__':

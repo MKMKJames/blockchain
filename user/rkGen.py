@@ -35,7 +35,8 @@ class PreGA:
         return bytesToObject(data, group)
 
     def rkGen(self, skid, IDsrc, IDdest):
-        N = integer(32423442342)
+        # N = integer(32423442342)
+        N = integer(randomBits(group.secparam))
         K = pair(skid, group.hash(IDdest, G1))
         return {'N': N, 'R': group.hash((K, IDsrc, IDdest, N), G1) * skid}
 
@@ -48,4 +49,4 @@ if __name__ == '__main__':
     # with open('./secret_key_' + id1, 'r') as f:
     #     s = f.read()
     #     sk = pre.deserialize_sk(eval(s))
-    print('\"' + pre.serialize_rk(pre.rkGen(pre.deserialize_sk(eval(sk1)), id1, id2)) + '\"', end='')
+    print(pre.serialize_rk(pre.rkGen(pre.deserialize_sk(sk1), id1, id2)), end='')

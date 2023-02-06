@@ -19,6 +19,7 @@ from charm.toolbox.hash_module import Hash
 from charm.core.engine.util import objectToBytes, bytesToObject
 import json
 
+
 class PreGA:
     def __init__(self):
         global group, h
@@ -68,6 +69,11 @@ class PreGA:
         data = eval(raw)
         return {'N': deserialize(data['N']), 'R': bytesToObject(data['R'], group)}
 
+    def rkGen(self, params, skid, IDsrc, IDdest):
+        N = integer(randomBits(group.secparam))
+        K = pair(skid, group.hash(IDdest, G1))
+        return {'N': N, 'R': group.hash((K, IDsrc, IDdest, N), G1) * skid}
+
     def serialize_ctext1(self, obj):
         return str({'S': objectToBytes(obj['S'], group),
                     'C': {
@@ -98,6 +104,7 @@ class PreGA:
                 'IDsrc': data['IDsrc'],
                 'N': deserialize(data['N'])}
 
+    # 同一份参数，每次加密的结果都不一样
     def encrypt(self, params, ID, M):
         enc_M = integer(M)
         # if bitsize(enc_M)/8 > group.messageSize():
@@ -113,12 +120,7 @@ class PreGA:
         ciphertext = {'S': S, 'C': C_}
         return ciphertext
 
-    def rkGen(self, params, skid, IDsrc, IDdest):
-        # print(randomBits(group.secparam))
-        N = integer(1145141919810)
-        K = pair(skid, group.hash(IDdest, G1))
-        return {'N': N, 'R': group.hash((K, IDsrc, IDdest, N), G1) * skid}
-
+    # 同一份参数，每次加密的结果都不一样
     def reEncrypt(self, params, IDsrc, rk, cid):
         H = group.hash((IDsrc, cid['C']), G1)
         if pair(params['g'], cid['S']) != pair(H, cid['C']['A']):
@@ -144,7 +146,7 @@ debug = False
 if debug:
     ID = "nikos fotiou"
     ID2 = "test user"
-    msg = '对方hi额34242423432234u文化iu文化我gieur江r手r絵rfg 儿童额头热天我微软 发士大夫士大夫五2 2 人房贷首付dsdf st43242342342332423fdgdfgfdfgdfgertertくぇれww絵wr123😀!!!！！'
+    msg = '{"Key":"Ss4OXQlZO5sjEgcSKjSAaIRlc_FvB9Qm0oJZXmUm3lc=","Location":"/alice/hello.txt"}'
     # print('msgsz: ', len(msg), bitsize(integer(msg))/8)
     pre = PreGA()
     (master_secret_key, params) = pre.setup()
