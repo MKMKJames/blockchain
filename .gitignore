@@ -1,4 +1,4 @@
-cloud_similating_server/db/*
+storage_service/db
 user/secret*
 pkg/__pycache__
 proxy/__pycache__

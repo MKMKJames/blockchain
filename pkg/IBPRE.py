@@ -24,43 +24,53 @@ debug = False
 
 class PreGA:
     def __init__(self):
-        self.group = PairingGroup('SS512', secparam=1024)
+        global group
+        group = PairingGroup('SS512', secparam=1024)
 
     def getParams(self):
         try:
             with open('./params', 'r') as f:
-                params = json.loads(f.read())
+                s_params = json.loads(f.read())
                 try:
-                    s = bytesToObject(eval(params['s']), self.group)
-                    g = bytesToObject(eval(params['g']), self.group)
-                    return {'s': s, 'g': g}
+                    s = bytesToObject(eval(s_params['s']), group)
+                    params = self.deserialize_params((s_params['params']))
+                    return {'s': s, 'params': params}
                 except:
                     print('fail to convert')
                     exit(-1)
         except:
             with open('./params', 'w') as f:
-                s = self.group.random(ZR)
-                g = self.group.random(G1)
-                dict = {'s': str(objectToBytes(s, self.group)),
-                        'g': str(objectToBytes(g, self.group))}
+                s = group.random(ZR)
+                g = group.random(G1)
+                params = {'g': g, 'g_s': g**s}
+                dict = {'s': str(objectToBytes(s, group)),
+                        'params': self.serialize_params(params)}
                 f.write(json.dumps(dict))
-                return {'s': s, 'g': g}
+                return {'s': s, 'params': params}
 
     def setup(self):
-        params = self.getParams()
-        s, g = params['s'], params['g']
-        return ({'s': s}, {'g': g, 'g_s': g**s})
+        s_params = self.getParams()
+        s, params = s_params['s'], s_params['params']
+        return ({'s': s}, params)
 
     def keyGen(self, msk, ID):
-        k = self.group.hash(ID, G1) ** msk['s']
+        k = group.hash(ID, G1) ** msk['s']
         return k
 
     def serialize_sk(self, obj):
-        return str(objectToBytes(obj, self.group))
+        return str(objectToBytes(obj, group))
 
+    def serialize_params(self, obj):
+        return str({'g': objectToBytes(obj['g'], group), 'g_s': objectToBytes(obj['g_s'], group)})
 
-# data = {'hello':'world'}
-# j1 = json.dumps(data)
-# print(j1)
+    def deserialize_params(self, raw):
+        data = eval(raw)
+        return {'g': bytesToObject(data['g'], group), 'g_s': bytesToObject(data['g_s'], group)}
 
-# print(json.dumps(j1))
+debug = False
+
+if debug:
+    pre = PreGA()
+    (sk, params) = pre.setup()
+    print(params)
+    print(pre.deserialize_params(pre.serialize_params(params)))

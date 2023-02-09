@@ -31,25 +31,16 @@ class PreGA:
             with open('./params', 'r') as f:
                 params = json.loads(f.read())
                 try:
-                    s = bytesToObject(eval(params['s']), group)
-                    g = bytesToObject(eval(params['g']), group)
-                    return {'s': s, 'g': g}
+                    return self.deserialize_params((params['params']))
                 except:
                     print('fail to convert')
                     exit(-1)
-        except:
-            with open('./params', 'w') as f:
-                s = group.random(ZR)
-                g = group.random(G1)
-                dict = {'s': str(objectToBytes(s, group)),
-                        'g': str(objectToBytes(g, group))}
-                f.write(json.dumps(dict))
-                return {'s': s, 'g': g}
+        except Exception as e:
+            print('proxy: cannot find ./params', e)
+            exit(-1)
 
     def setup(self):
-        params = self.getParams()
-        s, g = params['s'], params['g']
-        return ({'s': s}, {'g': g, 'g_s': g**s})
+        return self.getParams()
 
     def keyGen(self, msk, ID):
         k = group.hash(ID, G1) ** msk['s']
@@ -68,6 +59,13 @@ class PreGA:
     def deserialize_rk(self, raw):
         data = eval(raw)
         return {'N': deserialize(data['N']), 'R': bytesToObject(data['R'], group)}
+
+    def serialize_params(self, obj):
+        return str({'g': objectToBytes(obj['g'], group), 'g_s': objectToBytes(obj['g_s'], group)})
+
+    def deserialize_params(self, raw):
+        data = eval(raw)
+        return {'g': bytesToObject(data['g'], group), 'g_s': bytesToObject(data['g_s'], group)}
 
     def rkGen(self, params, skid, IDsrc, IDdest):
         N = integer(randomBits(group.secparam))

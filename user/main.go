@@ -127,7 +127,7 @@ func rkGenRemote(sk1, id1, id2 string) string {
 }
 
 func rkGen(sk1, id1, id2 string) string {
-	out, err := exec.Command("python3", "rkGen.py", sk1, id1, id2).Output()
+	out, err := exec.Command("python3", "crypto.py", "rkGen", sk1, id1, id2).Output()
 	if err != nil {
 		panic(err)
 	}
@@ -152,23 +152,14 @@ func reEncrypt(id, rk, cmsg string) string {
 	return string(body)
 }
 
-// 数据请求方得到二次加密的结果后，用自己的私钥，请求proxy进行解密，最终得到
+// 数据请求方得到二次加密的结果后，用自己的私钥进行解密，最终得到
 // 对称密钥
 func decrypt(sk2, id1, id2, cmsg string) string {
-	urlValues := url.Values{}
-	urlValues.Add("sk2", sk2)
-	urlValues.Add("id1", id1)
-	urlValues.Add("id2", id2)
-	urlValues.Add("cmsg", cmsg)
-	resp, err := http.PostForm("http://127.0.0.1:8888/decrypt", urlValues)
+	out, err := exec.Command("python3", "crypto.py", "decrypt", sk2, id1, id2, cmsg).Output()
 	if err != nil {
 		panic(err)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	return string(body)
+	return string(out)
 }
 
 func main() {
@@ -185,6 +176,8 @@ func main() {
 	re_ckey := reEncrypt(A, rk, ckey)
 
 	de_key := decrypt(sk2, A, B, re_ckey)
+
+	// fmt.Println(de_key)
 
 	println(decryptUserData(final, decodeCompoundKey(de_key).Key))
 }

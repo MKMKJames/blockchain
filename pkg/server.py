@@ -16,6 +16,9 @@ class Util:
     def serialize_sk(self, data):
         return self.proxy.serialize_sk(data)
 
+    def serialize_params(self, data):
+        return self.proxy.serialize_params(data)
+
 
 # 创建一个服务，把当前这个python文件当做一个服务
 server = flask.Flask(__name__)

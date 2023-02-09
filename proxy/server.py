@@ -7,7 +7,8 @@ from flask import request
 class Util:
     def __init__(self) -> None:
         self.proxy = pre.PreGA()
-        (self.master_secret_key, self.params) = self.proxy.setup()
+        self.params = self.proxy.setup()
+        # print(self.params)
 
     def encrypt(self, id, msg):
         return self.serialize_ctext1(self.proxy.encrypt(self.params, id, msg))
@@ -58,13 +59,15 @@ def reEncrypt():
     return util.reEncrypt(id, rk, cmsg)
 
 
-@server.route('/decrypt', methods=['post'])
-def decrypt():
-    sk2 = request.form['sk2']
-    id1 = request.form['id1']
-    id2 = request.form['id2']
-    cmsg = request.form['cmsg']
-    return util.decrypt(sk2, id1, id2, cmsg)
+# @server.route('/decrypt', methods=['post'])
+# def decrypt():
+#     sk2 = request.form['sk2']
+#     id1 = request.form['id1']
+#     id2 = request.form['id2']
+#     cmsg = request.form['cmsg']
+#     # print(util.decrypt(sk2, id1, id2, cmsg))
+#     # return "123"
+#     return util.decrypt(sk2, id1, id2, cmsg)
 
 
 if __name__ == '__main__':
